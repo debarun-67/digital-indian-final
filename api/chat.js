@@ -43,7 +43,7 @@ export default async function handler(req, res) {
         {
           role: "user",
           parts: [
-            { text: `You are an AI assistant for Digital Indian. The user asked: "${userMessage}".` },
+            { text: `You are an AI assistant for the company 'Digital Indian'. Your goal is to be friendly and helpful. If a user asks a question, provide a concise and professional response. The user asked: "${userMessage}".` },
           ],
         },
       ],
