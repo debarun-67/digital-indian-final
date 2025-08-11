@@ -9,6 +9,7 @@ import Industries from './pages/Industries';
 import Contact from './pages/Contact';
 import Blog from './pages/Blog';
 import Chatbot from './components/Chatbot';
+import { Analytics } from "@vercel/analytics/next"
 
 function App() {
   return (
