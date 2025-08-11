@@ -40,7 +40,7 @@ const Contact = () => {
     const fetchToken = async () => {
       setStatus('token_loading');
       try {
-        const response = await fetch('http://localhost:3001/api/token');
+        const response = await fetch('http://digitalindin2.vercel.app/api/token');
         const data = await response.json();
         setSessionToken(data.token);
         setStatus('idle');
@@ -95,7 +95,7 @@ const Contact = () => {
     }
     
     try {
-      const response = await fetch('http://localhost:3001/api/send-email', {
+      const response = await fetch('http://digitalindin2.vercel.app/api/send-email', {
         method: 'POST',
         body: data,
       });

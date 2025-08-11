@@ -182,5 +182,5 @@ app.post('/api/chat', async (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Backend server listening at http://localhost:${port}`);
+  console.log(`Backend server listening at https://digitalindian2.vercel.app`);
 });
