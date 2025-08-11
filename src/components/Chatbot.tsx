@@ -1,11 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageCircle, Send, X, Loader2 } from 'lucide-react';
 
-// Main Chatbot component
 const Chatbot = () => {
-  // State for controlling the chatbot's open/closed state
   const [isOpen, setIsOpen] = useState(false);
-  // State for storing the conversation history
   const [messages, setMessages] = useState([
     { text: "Hello! How can I assist you today? Here are some things I can help with:", sender: 'bot' },
     { type: 'faq_suggestions', suggestions: [
@@ -15,41 +12,48 @@ const Chatbot = () => {
       "How can I book a meeting?"
     ]}
   ]);
-  // State for the user's current input
-  const [input, setInput] = useState('');
-  // State for form submission status to disable the input and button
   const [status, setStatus] = useState<'idle' | 'submitting'>('idle');
-  
-  // Ref to keep the chat window scrolled to the bottom, with a specific type
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  // Ref for the input field to manage its value without re-rendering the component
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to the bottom of the chat window on new messages
   useEffect(() => {
-    // The '?' is optional chaining, so it only tries to call scrollIntoView if messagesEndRef.current is not null
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Handle sending a message
   const handleSendMessage = useCallback(async (text: string) => {
     const messageToSend = text.trim();
     if (messageToSend) {
       const userMessage = { text: messageToSend, sender: 'user' };
       setMessages(prevMessages => [...prevMessages, userMessage]);
-      
-      // Clear the input field directly after sending
+
       if (inputRef.current) {
         inputRef.current.value = '';
       }
 
-      setStatus('submitting'); 
+      setStatus('submitting');
 
       try {
+        const currentDateTime = new Date(); // Local system date/time
+
+        // Instant local handling for time/date questions
+        if (/^(what('| i)s)?\s*(the\s*)?(time|date)/i.test(messageToSend)) {
+          const formattedTime = currentDateTime.toLocaleTimeString();
+          const formattedDate = currentDateTime.toLocaleDateString();
+          const reply = `It's ${formattedTime} on ${formattedDate}.`;
+          setMessages(prevMessages => [...prevMessages, { text: reply, sender: 'bot' }]);
+          setStatus('idle');
+          return;
+        }
+
+        // Otherwise, send to backend
         const response = await fetch('http://localhost:3001/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: messageToSend })
+          body: JSON.stringify({
+            message: messageToSend,
+            datetime: currentDateTime.toISOString()
+          })
         });
 
         if (!response.ok) {
@@ -62,13 +66,15 @@ const Chatbot = () => {
         setStatus('idle');
       } catch (error) {
         console.error("Chatbot API error:", error);
-        setMessages(prevMessages => [...prevMessages, { text: "Sorry, I'm having trouble connecting right now. Please try again later.", sender: 'bot' }]);
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { text: "Sorry, I'm having trouble connecting right now. Please try again later.", sender: 'bot' }
+        ]);
         setStatus('idle');
       }
     }
-  }, [messages]);
+  }, []);
 
-  // Chatbot button to open/close the chat window
   const ChatbotButton = () => (
     <button 
       onClick={() => setIsOpen(!isOpen)}
@@ -79,10 +85,8 @@ const Chatbot = () => {
     </button>
   );
 
-  // Main chat window UI
   const ChatWindow = () => (
     <div className="fixed bottom-6 right-6 w-max sm:w-96 max-h-[80vh] flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 animate-fade-in-up">
-      {/* Chat header */}
       <div className="flex justify-between items-center p-4 bg-blue-600 text-white rounded-t-lg">
         <h3 className="font-semibold text-lg">AI Assistant</h3>
         <button onClick={() => setIsOpen(false)} className="p-1 rounded-full hover:bg-blue-700 transition-colors" aria-label="Close chat">
@@ -90,7 +94,6 @@ const Chatbot = () => {
         </button>
       </div>
 
-      {/* Message area */}
       <div className="flex-1 p-4 overflow-y-auto space-y-4">
         {messages.map((msg, index) => (
           msg.type === 'faq_suggestions' ? (
@@ -128,21 +131,20 @@ const Chatbot = () => {
           )
         ))}
         {status === 'submitting' && (
-           <div className="flex justify-start">
-             <div className="max-w-[70%] p-3 rounded-xl shadow-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-bl-none flex items-center space-x-2">
-               <Loader2 className="h-4 w-4 animate-spin" />
-               <span>Thinking...</span>
-             </div>
-           </div>
+          <div className="flex justify-start">
+            <div className="max-w-[70%] p-3 rounded-xl shadow-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-bl-none flex items-center space-x-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Thinking...</span>
+            </div>
+          </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input form */}
       <form onSubmit={(e) => {
         e.preventDefault();
         if (inputRef.current) {
-            handleSendMessage(inputRef.current.value);
+          handleSendMessage(inputRef.current.value);
         }
       }} className="p-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center space-x-2">

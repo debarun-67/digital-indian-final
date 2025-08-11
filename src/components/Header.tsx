@@ -65,17 +65,27 @@ const Header = () => {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo and company name - Left side */}
-          <Link to="/" className="flex items-center space-x-2">
-            <img src={logo} alt="Digital Indian Logo" className="h-10 w-auto" />
-            <div className="flex flex-col flex-shrink-0">
-              <span className="text-xl font-bold">
-                <span className="text-orange-500">DIGITAL</span>
-                <span className="text-green-500 ml-1">INDIAN</span>
-              </span>
-              <span className="text-xs text-gray-900 dark:text-gray-200 font-medium">Transforming New India</span>
-              <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">www.digitalindian.co.in</span>
-            </div>
-          </Link>
+          <a
+  href="https://www.digitalindian.co.in"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="flex items-center space-x-2"
+>
+  <img src={logo} alt="Digital Indian Logo" className="h-10 w-auto" />
+  <div className="flex flex-col flex-shrink-0">
+    <span className="text-xl font-bold">
+      <span className="text-orange-500">DIGITAL</span>
+      <span className="text-green-500 ml-1">INDIAN</span>
+    </span>
+    <span className="text-xs text-gray-900 dark:text-gray-200 font-medium">
+      Transforming New India
+    </span>
+    <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+      www.digitalindian.co.in
+    </span>
+  </div>
+</a>
+
 
           {/* Desktop Navigation Links and controls - Right side */}
           <div className="hidden lg:flex items-center space-x-6">

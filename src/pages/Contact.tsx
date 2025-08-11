@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle, XCircle, Loader2, Upload, Calendar as CalendarIcon, X } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle, XCircle, Loader2, Upload, X, ChevronDown, ChevronUp } from 'lucide-react';
 import thumbnailMap from '../assets/thumbnail_map.jpg';
 
 const Contact = () => {
@@ -17,14 +17,24 @@ const Contact = () => {
   const [sessionToken, setSessionToken] = useState<string>('');
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error' | 'token_loading'>('idle');
   
-  // State for the calendar modal and form data
-  const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
-  const [calendarFormData, setCalendarFormData] = useState({
-    date: '',
-    time: '',
-    title: 'Consultation with Digital Indian'
-  });
+  // State for the business hours dropdown
+  const [isHoursOpen, setIsHoursOpen] = useState(false);
 
+  // Business hours data
+  const businessHours: { [key: string]: string } = {
+    'Mon': '9:00 AM - 8:00 PM',
+    'Tue': '9:00 AM - 8:00 PM',
+    'Wed': '9:00 AM - 8:00 PM',
+    'Thu': '9:00 AM - 8:00 PM',
+    'Fri': '9:00 AM - 8:00 PM',
+    'Sat': '9:00 AM - 8:00 PM',
+    'Sun': '9:00 AM - 8:00 PM'
+  };
+
+  // Get today's business hours
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'short' });
+  const todayHours = businessHours[today] || 'Closed';
+  
   // Fetch the session token from the backend when the component mounts
   useEffect(() => {
     const fetchToken = async () => {
@@ -61,37 +71,6 @@ const Contact = () => {
       });
     }
   };
-
-  // Handles calendar form changes
-  const handleCalendarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCalendarFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-  
-  // Generates the Google Calendar URL
-  const handleSaveToCalendar = () => {
-    if (!calendarFormData.date || !calendarFormData.time) {
-      alert("Please select a date and time.");
-      return;
-    }
-
-    const startDateTime = new Date(`${calendarFormData.date}T${calendarFormData.time}`);
-    // Set event to be 1 hour long
-    const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000); 
-
-    const formatDateTime = (date: Date) => {
-      return date.toISOString().replace(/-|:|\.\d\d\d/g, '');
-    };
-
-    const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(calendarFormData.title)}&dates=${formatDateTime(startDateTime)}/${formatDateTime(endDateTime)}&details=${encodeURIComponent('Meeting scheduled via the website contact form.')}&sf=true&output=xml`;
-
-    window.open(googleCalendarUrl, '_blank');
-    setIsCalendarModalOpen(false);
-  };
-
 
   // Handles form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -173,9 +152,6 @@ const Contact = () => {
     {
       icon: <Clock className="h-8 w-8 text-blue-600" />,
       title: 'Business Hours',
-      details: ['Mon - Sun: 9:00 AM - 8:00 PM'],
-      action: 'View Calendar',
-      onClick: () => setIsCalendarModalOpen(true)
     }
   ];
 
@@ -401,38 +377,82 @@ const Contact = () => {
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                         {info.title}
                       </h3>
-                      <div className="space-y-1">
-                         {info.details && info.details.map((detail, idx) => (
-                           <p key={idx} className="text-gray-600 dark:text-gray-300">
-                             {detail}
-                           </p>
-                         ))}
-                         {/* Correctly renders multiple links for phone numbers */}
-                         {info.links && info.links.map((link, linkIndex) => (
-                           <a key={linkIndex} href={link.href} className="block text-gray-600 dark:text-gray-300 hover:text-blue-600">
-                             {link.text}
-                           </a>
-                         ))}
-                      </div>
-                      {info.action && (
-                        info.href ? (
-                          <a 
-                            href={info.href} 
-                            target={info.href !== '#' ? '_blank' : undefined} 
-                            rel={info.href !== '#' ? 'noopener noreferrer' : undefined} 
-                            className="mt-3 text-blue-600 font-medium hover:text-blue-800 transition-colors"
-                          >
-                            {info.action}
-                          </a>
-                        ) : (
-                          <button
-                            onClick={info.onClick}
-                            className="mt-3 text-blue-600 font-medium hover:text-blue-800 transition-colors flex items-center"
-                          >
-                            {info.action}
-                          </button>
-                        )
+                      
+                      {/* Special handling for Business Hours */}
+                      {info.title === 'Business Hours' ? (
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="text-gray-600 dark:text-gray-300">
+                              Today: <span className="font-medium text-blue-600">{todayHours}</span>
+                            </p>
+                            <button
+                              onClick={() => setIsHoursOpen(!isHoursOpen)}
+                              className="text-blue-600 hover:text-blue-800 transition-colors"
+                            >
+                              {isHoursOpen ? (
+                                <ChevronUp className="h-5 w-5" />
+                              ) : (
+                                <ChevronDown className="h-5 w-5" />
+                              )}
+                            </button>
+                          </div>
+                          
+                          {isHoursOpen && (
+                            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                              <div className="space-y-2">
+                                {Object.entries(businessHours).map(([day, hours]) => (
+                                  <div key={day} className="flex justify-between text-sm">
+                                    <span className={`font-medium ${
+                                      day === today 
+                                        ? 'text-blue-600' 
+                                        : 'text-gray-600 dark:text-gray-300'
+                                    }`}>
+                                      {day === 'Mon' ? 'Monday' :
+                                       day === 'Tue' ? 'Tuesday' :
+                                       day === 'Wed' ? 'Wednesday' :
+                                       day === 'Thu' ? 'Thursday' :
+                                       day === 'Fri' ? 'Friday' :
+                                       day === 'Sat' ? 'Saturday' : 'Sunday'}
+                                    </span>
+                                    <span className={`${
+                                      day === today 
+                                        ? 'text-blue-600 font-medium' 
+                                        : 'text-gray-500 dark:text-gray-400'
+                                    }`}>
+                                      {hours}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        /* Regular contact info rendering */
+                        <div className="space-y-1">
+                          {info.details && info.details.map((detail, idx) => (
+                            <p key={idx} className="text-gray-600 dark:text-gray-300">
+                              {detail}
+                            </p>
+                          ))}
+                          {info.links && info.links.map((link, linkIndex) => (
+                            <a key={linkIndex} href={link.href} className="block text-gray-600 dark:text-gray-300 hover:text-blue-600">
+                              {link.text}
+                            </a>
+                          ))}
+                        </div>
                       )}
+                      
+                      {info.action && info.href && info.title !== 'Business Hours' ? (
+                        <a 
+                          href={info.href} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="mt-3 text-blue-600 font-medium hover:text-blue-800 transition-colors"
+                        >
+                          {info.action}
+                        </a>
+                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -456,7 +476,7 @@ const Contact = () => {
           
           {/* Map Link */}
           <a
-            href="https://www.google.com/maps/place/EN+BLOCK,+EN+-+9,+EN+Block,+Sector+V,+Bidhannagar,+Kolkata,+West+Bengal+700091/@22.5735222,88.4332776,18.65z/data=!4m6!3m5!1s0x3a0275afb2dd949b:0xcaff4cf09f3240cf!8m2!3d22.5736058!4d88.43239!16s%2Fg%2F11rkm75qlp?entry=ttu&g_ep=EgoyMDI1MDgwNS4wIKXMDSoASAFQAw%3D%3D"
+            href="https://www.google.com/maps/place/EN+BLOCK,+EN+-+9,+EN+Block,+Sector+V,+Bidhannagar,+Kolkata,+West+Bengal+700091/@22.5735222,88.4332776,18.65z/data=!4m6!3m5!1s0x3a0275afb2dd949b:0xcaff4cf09f3240cf!8m2!3d22.5736058!4d88.43239!16s%2Fg%2G%2F11rkm75qlp?entry=ttu&g_ep=EgoyMDI1MDgwNS4wIKXMDSoASAFQAw%3D%3D"
             target="_blank"
             rel="noopener noreferrer"
             className="block group"
@@ -518,68 +538,6 @@ const Contact = () => {
           </div>
         </div>
       </section>
-
-      {/* Calendar Modal */}
-      {isCalendarModalOpen && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-2xl max-w-md w-full relative">
-            <button
-              onClick={() => setIsCalendarModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-            >
-              <X className="h-6 w-6" />
-            </button>
-            <h2 className="text-xl font-bold mb-4">Schedule a Meeting</h2>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="calendar-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  id="calendar-date"
-                  name="date"
-                  value={calendarFormData.date}
-                  onChange={handleCalendarChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600"
-                />
-              </div>
-              <div>
-                <label htmlFor="calendar-time" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Time
-                </label>
-                <input
-                  type="time"
-                  id="calendar-time"
-                  name="time"
-                  value={calendarFormData.time}
-                  onChange={handleCalendarChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600"
-                />
-              </div>
-              <div>
-                <label htmlFor="calendar-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Event Title
-                </label>
-                <input
-                  type="text"
-                  id="calendar-title"
-                  name="title"
-                  value={calendarFormData.title}
-                  onChange={handleCalendarChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600"
-                />
-              </div>
-            </div>
-            <button
-              onClick={handleSaveToCalendar}
-              className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-            >
-              Save to Google Calendar
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
