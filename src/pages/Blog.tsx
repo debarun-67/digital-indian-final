@@ -1,76 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { useBlog } from '../components/contexts/BlogContext';
 import { Calendar, User, ArrowRight, Tag } from 'lucide-react';
 
 const Blog = () => {
-  const blogPosts = [
-    {
-      id: 1,
-      title: '5G Network Deployment: Challenges and Opportunities',
-      excerpt: 'Exploring the key challenges and emerging opportunities in 5G network deployment for telecom operators.',
-      author: 'Sarah Chen',
-      date: '2025-01-15',
-      category: 'Telecommunications',
-      tags: ['5G', 'Network Infrastructure', 'Telecom'],
-      image: 'https://images.pexels.com/photos/5483077/pexels-photo-5483077.jpeg?auto=compress&cs=tinysrgb&w=600',
-      readTime: '5 min read'
-    },
-    {
-      id: 2,
-      title: 'GIS Solutions for Smart City Development',
-      excerpt: 'How geospatial technologies are transforming urban planning and smart city initiatives worldwide.',
-      author: 'Michael Rodriguez',
-      date: '2025-01-10',
-      category: 'GIS & Geospatial',
-      tags: ['Smart Cities', 'Urban Planning', 'GIS'],
-      image: 'https://images.pexels.com/photos/1036936/pexels-photo-1036936.jpeg?auto=compress&cs=tinysrgb&w=600',
-      readTime: '7 min read'
-    },
-    {
-      id: 3,
-      title: 'The Future of Fiber Optic Infrastructure',
-      excerpt: 'Latest trends and technologies shaping the future of fiber optic network infrastructure.',
-      author: 'John Richardson',
-      date: '2025-01-05',
-      category: 'Infrastructure',
-      tags: ['Fiber Optics', 'Network Infrastructure', 'Technology'],
-      image: 'https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=600',
-      readTime: '6 min read'
-    },
-    {
-      id: 4,
-      title: 'Digital Skills Training: Bridging the Technology Gap',
-      excerpt: 'How professional development programs are addressing the growing demand for digital skills.',
-      author: 'Emily Watson',
-      date: '2024-12-28',
-      category: 'Training & Development',
-      tags: ['Digital Skills', 'Training', 'Professional Development'],
-      image: 'https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=600',
-      readTime: '4 min read'
-    },
-    {
-      id: 5,
-      title: 'Remote Sensing Applications in Utility Management',
-      excerpt: 'Leveraging satellite imagery and remote sensing for efficient utility asset management.',
-      author: 'Sarah Chen',
-      date: '2024-12-20',
-      category: 'GIS & Geospatial',
-      tags: ['Remote Sensing', 'Utility Management', 'Asset Management'],
-      image: 'https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=600',
-      readTime: '8 min read'
-    },
-    {
-      id: 6,
-      title: 'Business Incubation Success Stories',
-      excerpt: 'Showcasing successful startups that have grown through our business incubation programs.',
-      author: 'Michael Rodriguez',
-      date: '2024-12-15',
-      category: 'Business Development',
-      tags: ['Startups', 'Business Incubation', 'Success Stories'],
-      image: 'https://images.pexels.com/photos/3184296/pexels-photo-3184296.jpeg?auto=compress&cs=tinysrgb&w=600',
-      readTime: '6 min read'
-    }
-  ];
+  const { posts } = useBlog();
+  
+  // Only show published posts
+  const publishedPosts = posts.filter(post => post.published);
 
   const categories = [
     'All Posts',
@@ -84,8 +21,8 @@ const Blog = () => {
   const [selectedCategory, setSelectedCategory] = React.useState('All Posts');
 
   const filteredPosts = selectedCategory === 'All Posts' 
-    ? blogPosts 
-    : blogPosts.filter(post => post.category === selectedCategory);
+    ? publishedPosts 
+    : publishedPosts.filter(post => post.category === selectedCategory);
 
   return (
     <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 transition-colors duration-500">
@@ -165,7 +102,7 @@ const Blog = () => {
                     <div className="flex items-center space-x-2">
                       <Tag className="h-4 w-4 text-gray-400" />
                       <div className="flex flex-wrap gap-1">
-                        {post.tags.slice(0, 2).map((tag, index) => (
+                        {post.tags.slice(0, 2).map((tag: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined, index: React.Key | null | undefined) => (
                           <span key={index} className="text-xs text-blue-600 dark:text-blue-200 bg-blue-50 dark:bg-blue-800 px-2 py-1 rounded">
                             {tag}
                           </span>
@@ -173,10 +110,13 @@ const Blog = () => {
                       </div>
                     </div>
                     
-                    <button className="text-blue-600 dark:text-blue-400 font-medium hover:text-blue-800 dark:hover:text-blue-500 transition-colors flex items-center group">
+                    <Link 
+                      to={`/blog/${post.id}`}
+                      className="text-blue-600 dark:text-blue-400 font-medium hover:text-blue-800 dark:hover:text-blue-500 transition-colors flex items-center group"
+                    >
                       Read More
                       <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </article>

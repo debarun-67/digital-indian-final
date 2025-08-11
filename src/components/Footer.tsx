@@ -1,13 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Facebook, Linkedin, Instagram, Youtube } from 'lucide-react';
+import { useAuth } from '../components/contexts/AuthContext'; // ✅ Added so we can use login state
 import logo from '../assets/logo.png';
 
 const Footer = () => {
+  const { isAuthenticated, isAdmin, user, logout } = useAuth(); // ✅ Same as Navbar
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          
           {/* Company Info */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
@@ -72,14 +76,14 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Contact Info + Admin Login */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <MapPin className="h-5 w-5 text-orange-500" />
                 <a
-                  href="https://www.google.com/maps/place/EN+BLOCK,+EN+-+9,+EN+Block,+Sector+V,+Bidhannagar,+Kolkata,+West+Bengal+700091/@22.5735222,88.4332776,18.65z/data=!4m6!3m5!1s0x3a0275afb2dd949b:0xcaff4cf09f3240cf!8m2!3d22.5736058!4d88.43239!16s%2Fg%2F11rkm75qlp?entry=ttu&g_ep=EgoyMDI1MDgwNS4wIKXMDSoASAFQAw%3D%3D"
+                  href="https://www.google.com/maps/place/EN+BLOCK..."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-white transition-colors"
@@ -98,6 +102,25 @@ const Footer = () => {
                 <a href="mailto:info@digitalindian.co.in" className="text-gray-400 hover:text-white transition-colors">
                   info@digitalindian.co.in
                 </a>
+              </div>
+
+              {/* ✅ Admin Login / Logout */}
+              <div className="mt-4">
+                {isAuthenticated ? (
+                  <button
+                    onClick={logout}
+                    className="text-gray-400 hover:text-red-400 text-sm transition-colors"
+                  >
+                    Logout {isAdmin && `(Admin: ${user?.username})`}
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="text-gray-400 hover:text-blue-400 text-sm transition-colors"
+                  >
+                    Admin Login
+                  </Link>
+                )}
               </div>
             </div>
           </div>
