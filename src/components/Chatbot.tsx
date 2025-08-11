@@ -34,9 +34,8 @@ const Chatbot = () => {
       setStatus('submitting');
 
       try {
-        const currentDateTime = new Date(); // Local system date/time
+        const currentDateTime = new Date();
 
-        // Instant local handling for time/date questions
         if (/^(what('| i)s)?\s*(the\s*)?(time|date)/i.test(messageToSend)) {
           const formattedTime = currentDateTime.toLocaleTimeString();
           const formattedDate = currentDateTime.toLocaleDateString();
@@ -46,7 +45,6 @@ const Chatbot = () => {
           return;
         }
 
-        // Otherwise, send to backend
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -86,87 +84,88 @@ const Chatbot = () => {
   );
 
   const ChatWindow = () => (
-    <div className="fixed bottom-6 right-6 w-max sm:w-96 max-h-[80vh] flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 animate-fade-in-up">
-      <div className="flex justify-between items-center p-4 bg-blue-600 text-white rounded-t-lg">
-        <h3 className="font-semibold text-lg">AI Assistant</h3>
-        <button onClick={() => setIsOpen(false)} className="p-1 rounded-full hover:bg-blue-700 transition-colors" aria-label="Close chat">
-          <X className="h-5 w-5" />
-        </button>
-      </div>
+  <div className="fixed bottom-6 right-6 w-full max-w-full sm:w-96 sm:max-w-sm max-h-[80vh] flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 animate-fade-in-up mx-2 sm:mx-0">
+    <div className="flex justify-between items-center p-4 bg-blue-600 text-white rounded-t-lg">
+      <h3 className="font-semibold text-lg">AI Assistant</h3>
+      <button onClick={() => setIsOpen(false)} className="p-1 rounded-full hover:bg-blue-700 transition-colors" aria-label="Close chat">
+        <X className="h-5 w-5" />
+      </button>
+    </div>
 
-      <div className="flex-1 p-4 overflow-y-auto space-y-4">
-        {messages.map((msg, index) => (
-          msg.type === 'faq_suggestions' ? (
-            <div key={index} className="flex justify-center text-center">
-              <div className="max-w-[80%] p-3 rounded-xl shadow-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-bl-none">
-                {msg.suggestions.map((suggestion, suggestionIndex) => (
-                  <button
-                    key={suggestionIndex}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleSendMessage(suggestion);
-                    }}
-                    className="block w-full text-left my-1 px-3 py-2 rounded-lg bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors text-sm"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div
-              key={index}
-              className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[70%] p-3 rounded-xl shadow-md ${
-                  msg.sender === 'user'
-                    ? 'bg-blue-500 text-white rounded-br-none'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-bl-none'
-                }`}
-              >
-                {msg.text}
-              </div>
-            </div>
-          )
-        ))}
-        {status === 'submitting' && (
-          <div className="flex justify-start">
-            <div className="max-w-[70%] p-3 rounded-xl shadow-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-bl-none flex items-center space-x-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Thinking...</span>
+    <div className="flex-1 p-4 overflow-y-auto space-y-4">
+      {messages.map((msg, index) => (
+        msg.type === 'faq_suggestions' ? (
+          <div key={index} className="flex justify-center text-center">
+            <div className="max-w-[90%] sm:max-w-[80%] p-3 rounded-xl shadow-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-bl-none break-words">
+              {msg.suggestions.map((suggestion, suggestionIndex) => (
+                <button
+                  key={suggestionIndex}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSendMessage(suggestion);
+                  }}
+                  className="block w-full text-left my-1 px-3 py-2 rounded-lg bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors text-sm break-words"
+                >
+                  {suggestion}
+                </button>
+              ))}
             </div>
           </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        if (inputRef.current) {
-          handleSendMessage(inputRef.current.value);
-        }
-      }} className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex items-center space-x-2">
-          <input
-            ref={inputRef}
-            type="text"
-            className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 dark:text-white"
-            placeholder="Type your message..."
-            disabled={status === 'submitting'}
-          />
-          <button
-            type="submit"
-            className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-            disabled={status === 'submitting'}
-            aria-label="Send message"
+        ) : (
+          <div
+            key={index}
+            className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            <Send className="h-5 w-5" />
-          </button>
+            <div
+              className={`max-w-[85%] sm:max-w-[70%] p-3 rounded-xl shadow-md break-words ${
+                msg.sender === 'user'
+                  ? 'bg-blue-500 text-white rounded-br-none'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-bl-none'
+              }`}
+            >
+              {msg.text}
+            </div>
+          </div>
+        )
+      ))}
+      {status === 'submitting' && (
+        <div className="flex justify-start">
+          <div className="max-w-[85%] sm:max-w-[70%] p-3 rounded-xl shadow-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-bl-none flex items-center space-x-2 break-words">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>Thinking...</span>
+          </div>
         </div>
-      </form>
+      )}
+      <div ref={messagesEndRef} />
     </div>
-  );
+
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      if (inputRef.current) {
+        handleSendMessage(inputRef.current.value);
+      }
+    }} className="p-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex items-center space-x-2">
+        <input
+          ref={inputRef}
+          type="text"
+          className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 dark:text-white"
+          placeholder="Type your message..."
+          disabled={status === 'submitting'}
+        />
+        <button
+          type="submit"
+          className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          disabled={status === 'submitting'}
+          aria-label="Send message"
+        >
+          <Send className="h-5 w-5" />
+        </button>
+      </div>
+    </form>
+  </div>
+);
+
 
   return (
     <>
