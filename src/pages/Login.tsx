@@ -60,12 +60,6 @@ const Login: React.FC = () => {
               </div>
             )}
 
-            <div className="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-200 px-4 py-3 rounded-md text-sm">
-              <p className="font-medium">Demo Credentials:</p>
-              <p>Username: <code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">admin</code></p>
-              <p>Password: <code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">admin123</code></p>
-            </div>
-
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Username
@@ -129,12 +123,6 @@ const Login: React.FC = () => {
               </button>
             </div>
           </form>
-        </div>
-
-        <div className="text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            This is a demo login system. In production, this would be connected to a secure authentication service.
-          </p>
         </div>
       </div>
     </div>

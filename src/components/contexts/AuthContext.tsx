@@ -1,18 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, AuthContextType } from '../../types/blog';
 
-// Environment variables must start with REACT_APP_ in React
-const ADMIN_CREDENTIALS = {
-  username: (import.meta as any).env.REACT_APP_ADMIN_USER || '',
-  password: (import.meta as any).env.REACT_APP_ADMIN_PASS || '',
-  user: {
-    id: '1',
-    username: 'admin',
-    email: 'admin@techsolutions.com',
-    role: 'admin' as const
-  }
-};
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -26,12 +14,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (username: string, password: string): Promise<boolean> => {
-    if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-      setUser(ADMIN_CREDENTIALS.user);
-      localStorage.setItem('currentUser', JSON.stringify(ADMIN_CREDENTIALS.user));
-      return true;
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.user) {
+        setUser(data.user);
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
@@ -47,7 +48,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAdmin: user?.role === 'admin'
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
