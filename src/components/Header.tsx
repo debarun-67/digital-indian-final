@@ -141,11 +141,15 @@ const Header = () => {
               </div>
             </button>
             <button
-              className="p-2"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+  className="p-2"
+  onClick={() => setIsMenuOpen(!isMenuOpen)}
+>
+  {isMenuOpen ? (
+    <X className="h-6 w-6 text-gray-800 dark:text-gray-200 transition-colors duration-300" />
+  ) : (
+    <Menu className="h-6 w-6 text-gray-800 dark:text-gray-200 transition-colors duration-300" />
+  )}
+</button>
           </div>
         </div>
 
