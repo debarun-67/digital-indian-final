@@ -20,5 +20,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "api/login.ts"]
+  "include": ["src", "src/pages/login.ts"]
 }
