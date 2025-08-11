@@ -1,0 +1,292 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Calendar, User, ArrowRight, Tag } from 'lucide-react';
+
+const Blog = () => {
+  const blogPosts = [
+    {
+      id: 1,
+      title: '5G Network Deployment: Challenges and Opportunities',
+      excerpt: 'Exploring the key challenges and emerging opportunities in 5G network deployment for telecom operators.',
+      author: 'Sarah Chen',
+      date: '2025-01-15',
+      category: 'Telecommunications',
+      tags: ['5G', 'Network Infrastructure', 'Telecom'],
+      image: 'https://images.pexels.com/photos/5483077/pexels-photo-5483077.jpeg?auto=compress&cs=tinysrgb&w=600',
+      readTime: '5 min read'
+    },
+    {
+      id: 2,
+      title: 'GIS Solutions for Smart City Development',
+      excerpt: 'How geospatial technologies are transforming urban planning and smart city initiatives worldwide.',
+      author: 'Michael Rodriguez',
+      date: '2025-01-10',
+      category: 'GIS & Geospatial',
+      tags: ['Smart Cities', 'Urban Planning', 'GIS'],
+      image: 'https://images.pexels.com/photos/1036936/pexels-photo-1036936.jpeg?auto=compress&cs=tinysrgb&w=600',
+      readTime: '7 min read'
+    },
+    {
+      id: 3,
+      title: 'The Future of Fiber Optic Infrastructure',
+      excerpt: 'Latest trends and technologies shaping the future of fiber optic network infrastructure.',
+      author: 'John Richardson',
+      date: '2025-01-05',
+      category: 'Infrastructure',
+      tags: ['Fiber Optics', 'Network Infrastructure', 'Technology'],
+      image: 'https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=600',
+      readTime: '6 min read'
+    },
+    {
+      id: 4,
+      title: 'Digital Skills Training: Bridging the Technology Gap',
+      excerpt: 'How professional development programs are addressing the growing demand for digital skills.',
+      author: 'Emily Watson',
+      date: '2024-12-28',
+      category: 'Training & Development',
+      tags: ['Digital Skills', 'Training', 'Professional Development'],
+      image: 'https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=600',
+      readTime: '4 min read'
+    },
+    {
+      id: 5,
+      title: 'Remote Sensing Applications in Utility Management',
+      excerpt: 'Leveraging satellite imagery and remote sensing for efficient utility asset management.',
+      author: 'Sarah Chen',
+      date: '2024-12-20',
+      category: 'GIS & Geospatial',
+      tags: ['Remote Sensing', 'Utility Management', 'Asset Management'],
+      image: 'https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=600',
+      readTime: '8 min read'
+    },
+    {
+      id: 6,
+      title: 'Business Incubation Success Stories',
+      excerpt: 'Showcasing successful startups that have grown through our business incubation programs.',
+      author: 'Michael Rodriguez',
+      date: '2024-12-15',
+      category: 'Business Development',
+      tags: ['Startups', 'Business Incubation', 'Success Stories'],
+      image: 'https://images.pexels.com/photos/3184296/pexels-photo-3184296.jpeg?auto=compress&cs=tinysrgb&w=600',
+      readTime: '6 min read'
+    }
+  ];
+
+  const categories = [
+    'All Posts',
+    'Telecommunications',
+    'GIS & Geospatial',
+    'Infrastructure',
+    'Training & Development',
+    'Business Development'
+  ];
+
+  const [selectedCategory, setSelectedCategory] = React.useState('All Posts');
+
+  const filteredPosts = selectedCategory === 'All Posts' 
+    ? blogPosts 
+    : blogPosts.filter(post => post.category === selectedCategory);
+
+  return (
+    <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 transition-colors duration-500">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-blue-900 to-blue-700 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold mb-6">
+              News & Insights
+            </h1>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+              Stay updated with the latest industry trends, technology insights, 
+              and company updates from our team of experts.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Category Filter */}
+      <section className="py-8 bg-white dark:bg-gray-900 border-b dark:border-gray-700 transition-colors duration-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap gap-2 justify-center">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-full font-medium transition-colors ${
+                  selectedCategory === category
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Blog Posts */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-800 transition-colors duration-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredPosts.map((post) => (
+              <article key={post.id} className="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden hover:shadow-xl dark:hover:shadow-lg transition-shadow group">
+                <div className="relative overflow-hidden">
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                      {post.category}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="p-6">
+                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                    <User className="h-4 w-4 mr-1" />
+                    <span className="mr-4">{post.author}</span>
+                    <Calendar className="h-4 w-4 mr-1" />
+                    <span className="mr-4">{new Date(post.date).toLocaleDateString()}</span>
+                    <span>{post.readTime}</span>
+                  </div>
+                  
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {post.title}
+                  </h2>
+                  
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
+                    {post.excerpt}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Tag className="h-4 w-4 text-gray-400" />
+                      <div className="flex flex-wrap gap-1">
+                        {post.tags.slice(0, 2).map((tag, index) => (
+                          <span key={index} className="text-xs text-blue-600 dark:text-blue-200 bg-blue-50 dark:bg-blue-800 px-2 py-1 rounded">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <button className="text-blue-600 dark:text-blue-400 font-medium hover:text-blue-800 dark:hover:text-blue-500 transition-colors flex items-center group">
+                      Read More
+                      <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {filteredPosts.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-600 dark:text-gray-400 text-lg">No posts found in this category.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Newsletter Signup */}
+      <section className="py-16 bg-blue-600 text-white dark:bg-blue-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">
+            Stay Updated
+          </h2>
+          <p className="text-xl text-blue-100 dark:text-blue-200 mb-8 max-w-2xl mx-auto">
+            Subscribe to our newsletter to receive the latest industry insights, 
+            technology updates, and company news directly in your inbox.
+          </p>
+          
+          <div className="max-w-md mx-auto">
+            <div className="flex">
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                className="flex-1 px-4 py-3 rounded-l-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white dark:bg-gray-800 dark:text-white"
+              />
+              <button className="bg-orange-500 text-white px-6 py-3 rounded-r-lg font-semibold hover:bg-orange-600 transition-colors">
+                Subscribe
+              </button>
+            </div>
+            <p className="text-blue-100 dark:text-blue-200 text-sm mt-2">
+              We respect your privacy. Unsubscribe at any time.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Recent Updates */}
+      <section className="py-16 bg-white dark:bg-gray-900 transition-colors duration-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              Company Updates
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              Latest news and announcements from TechSolutions.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {[
+              {
+                date: '2025-01-20',
+                title: 'TechSolutions Expands Operations to New Markets',
+                description: 'We\'re excited to announce our expansion into three new regional markets, bringing our technology solutions to more businesses.'
+              },
+              {
+                date: '2025-01-15',
+                title: 'Partnership with Leading Telecom Equipment Manufacturer',
+                description: 'Strategic partnership announced to enhance our 5G infrastructure deployment capabilities and service offerings.'
+              },
+              {
+                date: '2025-01-10',
+                title: 'New GIS Training Center Opens',
+                description: 'Our state-of-the-art training facility is now operational, offering advanced GIS and geospatial analytics courses.'
+              }
+            ].map((update, index) => (
+              <div key={index} className="border-l-4 border-blue-600 dark:border-blue-400 pl-6 py-4">
+                <div className="text-sm text-blue-600 dark:text-blue-400 font-medium mb-1">
+                  {new Date(update.date).toLocaleDateString()}
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  {update.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {update.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-gray-900 text-white dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-6">
+            Have a Story to Share?
+          </h2>
+          <p className="text-xl text-gray-300 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+            We'd love to hear about your technology challenges and success stories. 
+            Contact us to explore collaboration opportunities or guest posting.
+          </p>
+          <Link
+            to="/contact"
+            className="bg-orange-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-orange-600 transition-colors inline-flex items-center"
+          >
+            Get in Touch
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Blog;
