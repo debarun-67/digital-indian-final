@@ -95,7 +95,7 @@ const Contact = () => {
     }
     
     try {
-      const response = await fetch('/api/send-email', {
+      const response = await fetch('/api/send-mail', {
         method: 'POST',
         body: data,
       });
