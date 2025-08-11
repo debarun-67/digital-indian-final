@@ -81,7 +81,7 @@ const Chatbot = () => {
 
   // Main chat window UI
   const ChatWindow = () => (
-    <div className="fixed bottom-6 right-6 w-full sm:w-96 max-h-[80vh] flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 animate-fade-in-up">
+    <div className="fixed bottom-6 right-6 w-max sm:w-96 max-h-[80vh] flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 animate-fade-in-up">
       {/* Chat header */}
       <div className="flex justify-between items-center p-4 bg-blue-600 text-white rounded-t-lg">
         <h3 className="font-semibold text-lg">AI Assistant</h3>
