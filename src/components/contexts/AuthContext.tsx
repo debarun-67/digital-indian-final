@@ -1,12 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, AuthContextType } from '../../types/blog';
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Mock admin credentials - in production, this would be handled by a backend
+// Environment variables must start with REACT_APP_ in React
 const ADMIN_CREDENTIALS = {
-  username: process.env.admin_user,
-  password: process.env.admin_pass,
+  username: (import.meta as any).env.REACT_APP_ADMIN_USER || '',
+  password: (import.meta as any).env.REACT_APP_ADMIN_PASS || '',
   user: {
     id: '1',
     username: 'admin',
@@ -15,11 +13,12 @@ const ADMIN_CREDENTIALS = {
   }
 };
 
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Check if user is already logged in (from localStorage)
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
@@ -27,7 +26,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (username: string, password: string): Promise<boolean> => {
-    // Mock authentication - in production, this would be an API call
     if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
       setUser(ADMIN_CREDENTIALS.user);
       localStorage.setItem('currentUser', JSON.stringify(ADMIN_CREDENTIALS.user));
@@ -49,16 +47,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAdmin: user?.role === 'admin'
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
