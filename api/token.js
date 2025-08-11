@@ -1,10 +1,17 @@
+// api/generate-token.js
 import crypto from "crypto";
 
 export default function handler(req, res) {
   if (req.method !== "GET") {
-    return res.status(405).json({ error: "Method not allowed" });
+    res.setHeader("Allow", ["GET"]);
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const token = crypto.randomUUID();
-  res.status(200).json({ token });
+  try {
+    const token = crypto.randomUUID();
+    return res.status(200).json({ token });
+  } catch (err) {
+    console.error("Error generating token:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
 }
