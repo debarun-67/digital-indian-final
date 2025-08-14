@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useBlog } from '../components/contexts/BlogContext';
 import { useAuth } from '../components/contexts/AuthContext';
 import { Save, Eye, ArrowLeft, Image, Tag, Calendar } from 'lucide-react';
+import { BlogPost } from '../types/blog';
 
 const PostEditor: React.FC = () => {
   const { id } = useParams();
@@ -18,11 +19,12 @@ const PostEditor: React.FC = () => {
     excerpt: '',
     content: '',
     author: user?.username || '',
-    category: 'Telecommunications',
+    category: 'Technology',
     tags: '',
     image: '',
     readTime: '5 min read',
-    published: false
+    status: 'draft' as 'published' | 'draft',
+    type: 'post' as 'post' | 'update'
   });
 
   const [preview, setPreview] = useState(false);
@@ -38,7 +40,8 @@ const PostEditor: React.FC = () => {
         tags: existingPost.tags.join(', '),
         image: existingPost.image,
         readTime: existingPost.readTime,
-        published: existingPost.published
+        status: existingPost.status,
+        type: existingPost.type
       });
     }
   }, [existingPost]);
@@ -55,28 +58,27 @@ const PostEditor: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent, publish = false) => {
     e.preventDefault();
-    
-    const postData = {
+    const postData: Omit<BlogPost, 'id'> = {
       ...formData,
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
       date: existingPost?.date || new Date().toISOString().split('T')[0],
-      published: publish || formData.published
+      status: publish ? 'published' : 'draft',
+      published: undefined
     };
-
+    
     if (isEditing && existingPost) {
       updatePost(existingPost.id, postData);
     } else {
       addPost(postData);
     }
-
     navigate('/admin');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      [name]: value
     }));
   };
 
@@ -110,7 +112,6 @@ const PostEditor: React.FC = () => {
                 </span>
                 <span>{formData.author}</span>
                 <span>{new Date().toLocaleDateString()}</span>
-                <span>{formData.readTime}</span>
               </div>
               
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
@@ -149,16 +150,16 @@ const PostEditor: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => navigate('/admin')}
               className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Back to Dashboard</span>
+              <span className="hidden sm:inline">Back to Dashboard</span>
             </button>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
               {isEditing ? 'Edit Post' : 'Create New Post'}
             </h1>
           </div>
@@ -174,7 +175,7 @@ const PostEditor: React.FC = () => {
           </div>
         </div>
 
-        <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
+        <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-6">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
@@ -270,7 +271,7 @@ const PostEditor: React.FC = () => {
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div>
                 <label htmlFor="image" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Featured Image URL
                 </label>
@@ -293,6 +294,22 @@ const PostEditor: React.FC = () => {
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   Use high-quality images from Pexels or other free stock photo sites
                 </p>
+              </div>
+
+              <div>
+                <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Post Type
+                </label>
+                <select
+                  id="type"
+                  name="type"
+                  value={formData.type}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="post">Blog Post</option>
+                  <option value="update">Company Update</option>
+                </select>
               </div>
             </div>
           </div>
@@ -319,29 +336,17 @@ const PostEditor: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="published"
-                    checked={formData.published}
-                    onChange={handleInputChange}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                    Publish immediately
-                  </span>
-                </label>
-              </div>
-
-              <div className="flex items-center space-x-3">
                 <button
-                  type="submit"
+                  type="button"
                   className="flex items-center space-x-2 px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                  onClick={(e) => handleSubmit(e, false)}
                 >
                   <Save className="h-4 w-4" />
                   <span>Save as Draft</span>
                 </button>
-                
+              </div>
+
+              <div className="flex items-center space-x-3">
                 <button
                   type="button"
                   onClick={(e) => handleSubmit(e, true)}

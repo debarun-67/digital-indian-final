@@ -246,7 +246,7 @@ const AdminDashboard: React.FC = () => {
                             <Edit className="h-4 w-4" />
                           </Link>
                           <button
-                            onClick={() => handleTogglePublish(post.id, post.published)}
+                            onClick={() => handleTogglePublish(post.id, Boolean(post.published))}
                             className={`${
                               post.published
                                 ? 'text-yellow-600 dark:text-yellow-400 hover:text-yellow-800 dark:hover:text-yellow-300'

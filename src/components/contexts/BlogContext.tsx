@@ -37,7 +37,8 @@ const initialPosts: BlogPost[] = [
     image: 'https://images.pexels.com/photos/5483077/pexels-photo-5483077.jpeg?auto=compress&cs=tinysrgb&w=600',
     readTime: '5 min read',
     status: 'published',
-    type: 'post'
+    type: 'post',
+    published: undefined
   },
   {
     id: '2',
@@ -60,7 +61,8 @@ const initialPosts: BlogPost[] = [
     image: 'https://images.pexels.com/photos/1036936/pexels-photo-1036936.jpeg?auto=compress&cs=tinysrgb&w=600',
     readTime: '7 min read',
     status: 'published',
-    type: 'post'
+    type: 'post',
+    published: undefined
   }
 ];
 

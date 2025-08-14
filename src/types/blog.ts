@@ -1,4 +1,5 @@
 export interface BlogPost {
+  published: unknown;
   id: string;
   title: string;
   excerpt: string;
