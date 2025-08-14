@@ -7,6 +7,11 @@ import logo from '../assets/logo.png';
 const Footer = () => {
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
 
+  // Hide footer completely on protected pages
+  if (isAuthenticated) {
+    return null;
+  }
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -60,7 +65,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact Info + Admin Login */}
+          {/* Contact Info + Admin Access */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
             <div className="space-y-3">
@@ -88,9 +93,17 @@ const Footer = () => {
                 </a>
               </div>
 
-              {/* Admin Login / Logout / Dashboard */}
-              <div className="mt-4 flex flex-col space-y-2">
-                {isAuthenticated ? (
+              {/* Admin Access */}
+              <div className="flex items-center space-x-3 pt-2 border-t border-gray-700 mt-4">
+                <h4 className="text-lg font-semibold">Admin Access</h4>
+                {!isAuthenticated ? (
+                  <Link
+                    to="/login"
+                    className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
+                  >
+                    Admin Login
+                  </Link>
+                ) : (
                   <>
                     {isAdmin && (
                       <Link
@@ -107,13 +120,6 @@ const Footer = () => {
                       Logout {isAdmin && `(Admin: ${user?.username})`}
                     </button>
                   </>
-                ) : (
-                  <Link
-                    to="/login"
-                    className="text-gray-400 hover:text-blue-400 text-sm transition-colors"
-                  >
-                    Admin Login
-                  </Link>
                 )}
               </div>
             </div>

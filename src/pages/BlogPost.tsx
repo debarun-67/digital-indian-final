@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { useBlog } from '../components/contexts/BlogContext';
 import { Calendar, User, Tag, ArrowLeft, Clock } from 'lucide-react';
@@ -14,7 +13,7 @@ const BlogPost: React.FC = () => {
   }
 
   // Don't show unpublished posts to public
-  if (!post.published) {
+  if (post.status !== 'published') {
     return <Navigate to="/blog" replace />;
   }
 
@@ -48,7 +47,7 @@ const BlogPost: React.FC = () => {
               {post.title}
             </h1>
             
-            <p className="text-xl text-gray-200 mb-6 max-w-3xl">
+            <p className="text-xl text-blue-100 mb-6 max-w-3xl">
               {post.excerpt}
             </p>
             
@@ -71,7 +70,7 @@ const BlogPost: React.FC = () => {
       </div>
 
       {/* Content */}
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-gray-900 dark:text-gray-200">
         <div className="prose prose-lg dark:prose-invert max-w-none">
           <div dangerouslySetInnerHTML={{ __html: post.content }} />
         </div>

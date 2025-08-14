@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode} from 'react';
 import { BlogPost } from '../../types/blog';
 
 interface BlogContextType {
@@ -36,7 +36,8 @@ const initialPosts: BlogPost[] = [
     tags: ['5G', 'Network Infrastructure', 'Telecom'],
     image: 'https://images.pexels.com/photos/5483077/pexels-photo-5483077.jpeg?auto=compress&cs=tinysrgb&w=600',
     readTime: '5 min read',
-    published: true
+    status: 'published',
+    type: 'post'
   },
   {
     id: '2',
@@ -58,7 +59,8 @@ const initialPosts: BlogPost[] = [
     tags: ['Smart Cities', 'Urban Planning', 'GIS'],
     image: 'https://images.pexels.com/photos/1036936/pexels-photo-1036936.jpeg?auto=compress&cs=tinysrgb&w=600',
     readTime: '7 min read',
-    published: true
+    status: 'published',
+    type: 'post'
   }
 ];
 
@@ -85,6 +87,8 @@ export const BlogProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const newPost: BlogPost = {
       ...post,
       id: Date.now().toString(),
+      status: post.status || 'draft',
+      type: post.type || 'post',
     };
     const newPosts = [newPost, ...posts];
     savePosts(newPosts);
@@ -128,3 +132,4 @@ export const useBlog = () => {
   }
   return context;
 };
+

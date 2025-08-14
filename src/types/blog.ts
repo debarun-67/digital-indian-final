@@ -9,7 +9,8 @@ export interface BlogPost {
   tags: string[];
   image: string;
   readTime: string;
-  published: boolean;
+  status: 'published' | 'draft';
+  type: 'post' | 'update';
 }
 
 export interface User {

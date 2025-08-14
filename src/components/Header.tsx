@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon, LogOut, User } from 'lucide-react';
 import logo from '../assets/logo.png';
+import { useAuth } from '../components/contexts/AuthContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [theme, setTheme] = useState('light');
   const [scrollProgress, setScrollProgress] = useState(0);
   const location = useLocation();
+  const { isAuthenticated, isAdmin, user, logout } = useAuth();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -57,6 +59,11 @@ const Header = () => {
     { name: 'Contact', href: '/contact' },
     { name: 'Blog', href: '/blog' },
   ];
+  
+  // Conditionally add Admin link if user is an admin
+  if (isAdmin) {
+    navigation.splice(5, 0, { name: 'Dashboard', href: '/admin' });
+  }
 
   const isActive = (href: string) => location.pathname === href;
 
@@ -65,27 +72,17 @@ const Header = () => {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo and company name - Left side */}
-          <a
-  href="https://www.digitalindian.co.in"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="flex items-center space-x-2"
->
-  <img src={logo} alt="Digital Indian Logo" className="h-10 w-auto" />
-  <div className="flex flex-col flex-shrink-0">
-    <span className="text-xl font-bold">
-      <span className="text-orange-500">DIGITAL</span>
-      <span className="text-green-500 ml-1">INDIAN</span>
-    </span>
-    <span className="text-xs text-gray-900 dark:text-gray-200 font-medium">
-      Transforming New India
-    </span>
-    <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-      www.digitalindian.co.in
-    </span>
-  </div>
-</a>
-
+          <Link to="/" className="flex items-center space-x-2">
+            <img src={logo} alt="Digital Indian Logo" className="h-10 w-auto" />
+            <div className="flex flex-col flex-shrink-0">
+              <span className="text-xl font-bold">
+                <span className="text-orange-500">DIGITAL</span>
+                <span className="text-green-500 ml-1">INDIAN</span>
+              </span>
+              <span className="text-xs text-gray-900 dark:text-gray-200 font-medium">Transforming New India</span>
+              <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">www.digitalindian.co.in</span>
+            </div>
+          </Link>
 
           {/* Desktop Navigation Links and controls - Right side */}
           <div className="hidden lg:flex items-center space-x-6">
@@ -105,12 +102,33 @@ const Header = () => {
               ))}
             </nav>
             
-            <Link
-              to="/contact"
-              className="bg-orange-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-600 transition-colors"
-            >
-              Get Quote
-            </Link>
+            {!isAuthenticated ? (
+              <Link
+                to="/contact"
+                className="bg-orange-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-600 transition-colors"
+              >
+                Get Quote
+              </Link>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
+                  <User className="h-4 w-4" />
+                  <span>{user?.username}</span>
+                  {isAdmin && (
+                    <span className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full text-xs">
+                      Admin
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={logout}
+                  className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
 
             <button
               onClick={toggleTheme}
@@ -151,15 +169,11 @@ const Header = () => {
               </div>
             </button>
             <button
-  className="p-2"
-  onClick={() => setIsMenuOpen(!isMenuOpen)}
->
-  {isMenuOpen ? (
-    <X className="h-6 w-6 text-gray-800 dark:text-gray-200 transition-colors duration-300" />
-  ) : (
-    <Menu className="h-6 w-6 text-gray-800 dark:text-gray-200 transition-colors duration-300" />
-  )}
-</button>
+              className="p-2"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="h-6 w-6 text-gray-900 dark:text-white" /> : <Menu className="h-6 w-6 text-gray-900 dark:text-white" />}
+            </button>
           </div>
         </div>
 
