@@ -20,5 +20,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "api/login.ts", "api/subscribe.js"]
+  "include": ["src", "api/login.ts", "api/subscribe.ts"]
 }

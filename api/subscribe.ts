@@ -1,4 +1,5 @@
-// /pages/api/subscribe.js
+// /pages/api/subscribe.ts
+import type { NextApiRequest, NextApiResponse } from "next";
 import { MongoClient } from "mongodb";
 import nodemailer from "nodemailer";
 
@@ -6,27 +7,33 @@ const uri = process.env.MONGODB_URI;
 const dbName = "myWebsiteDB";
 const collectionName = "subscribers";
 
-// Cached MongoDB connection
-let cachedClient = null;
+// Global cached client to prevent "Topology is closed"
+let cachedClient: MongoClient;
+let cachedDb: any;
+
 async function connectToDatabase() {
+  if (cachedDb) return cachedDb;
+
   if (!cachedClient) {
-    cachedClient = new MongoClient(uri);
+    cachedClient = new MongoClient(uri!);
     await cachedClient.connect();
   }
-  return cachedClient.db(dbName);
+
+  cachedDb = cachedClient.db(dbName);
+  return cachedDb;
 }
 
-// Start watcher once at server start
+// Start subscriber watcher once
 async function startSubscriberWatcher() {
   try {
     const db = await connectToDatabase();
     const collection = db.collection(collectionName);
 
-    const changeStream = collection.watch();
-    changeStream.on("change", (change) => {
-      console.log("📢 New subscription detected:", change);
-      // You can call your blog-related logic here automatically
-      // e.g., refreshBlogPosts();
+    // Watch for new inserts
+    const changeStream = collection.watch([{ $match: { operationType: "insert" } }]);
+    changeStream.on("change", (change: { fullDocument: { email: any; }; }) => {
+      console.log("📢 New subscription detected:", change.fullDocument.email);
+      // You can trigger blog-related logic here, e.g., send welcome email or notify admin
     });
 
     console.log("✅ Subscriber watcher started");
@@ -35,10 +42,13 @@ async function startSubscriberWatcher() {
   }
 }
 
-// Run the watcher immediately
-startSubscriberWatcher();
+// Only start once (serverless-safe)
+if (process.env.SUBSCRIBER_WATCHER_STARTED !== "true") {
+  startSubscriberWatcher();
+  process.env.SUBSCRIBER_WATCHER_STARTED = "true";
+}
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -59,10 +69,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Email already subscribed" });
     }
 
-    // Store in DB
+    // Insert new subscriber
     await collection.insertOne({ email, subscribedAt: new Date() });
 
-    // Gmail SMTP configuration
+    // Send welcome email
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -83,7 +93,7 @@ export default async function handler(req, res) {
     });
 
     return res.status(201).json({ message: "Subscribed successfully!" });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Subscription error:", error.message, error.stack);
     return res.status(500).json({ error: error.message });
   }
